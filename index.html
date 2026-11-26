@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ALFIAN TOUR & TRAVEL - Simulasi Kantor AI</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a1128}
+body{font:13px/1.4 "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:#e8e8ec;-webkit-font-smoothing:antialiased}
+#app{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;overflow:hidden;background:radial-gradient(60% 80% at 20% 30%,#1b5fd6aa,transparent 60%),radial-gradient(50% 70% at 82% 72%,#7a3bd1aa,transparent 60%),radial-gradient(40% 50% at 60% 8%,#14a3c8aa,transparent 60%),#0a1128}
+/* jendela Win 11 */
+.win{background:rgba(30,31,38,.9);backdrop-filter:blur(20px);border:1px solid #ffffff1a;border-radius:8px;box-shadow:0 8px 24px #0008;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.tb{height:32px;flex:none;display:flex;align-items:center;justify-content:space-between;padding-left:12px;font-size:12.5px;color:#f0f0f4;background:#ffffff0d}
+.ctl{display:flex;height:100%}
+.ctl i,.cx{width:44px;height:100%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;color:#ddd}
+.ctl i:hover{background:#ffffff1a}.ctl i:last-child:hover,.cx:hover{background:#c42b1c;color:#fff}.cx{cursor:pointer}
+.main2{position:absolute;left:10px;top:10px;right:10px;bottom:58px;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:10px}
+.L{display:grid;grid-template-rows:1fr 200px;gap:10px;min-height:0}
+.R{display:grid;grid-template-rows:auto 1fr 1fr;gap:10px;min-height:0}
+/* taskbar */
+.task{position:absolute;left:0;right:0;bottom:0;height:48px;background:rgba(24,25,32,.92);backdrop-filter:blur(30px);border-top:1px solid #ffffff14;display:flex;align-items:center;padding:0 14px;z-index:20}
+.task .lf{flex:1;font-size:12px;color:#aab}
+.task .mid{display:flex;gap:6px;align-items:center}
+.task .rt{flex:1;display:flex;justify-content:flex-end;align-items:center;gap:14px;font-size:12px;text-align:right;line-height:1.25}
+.start{width:36px;height:36px;display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:10px;border-radius:6px}
+.start:hover{background:#ffffff14}.start i{background:#4cc2ff;border-radius:1px}
+button,select{font:inherit;font-size:13px;background:#ffffff14;border:1px solid #ffffff14;border-radius:5px;color:#f2f2f5;padding:0 12px;height:32px;cursor:pointer}
+button:hover,select:hover{background:#ffffff24}button:active{background:#ffffff0c}
+button.st{background:#60cdff;color:#000;border-color:#60cdff;font-weight:600}button.st:hover{background:#7fd7ff}
+select{padding:0 6px}select option{background:#2b2b31;color:#fff}
+/* panggung 3D */
+#stage{position:relative;flex:1;min-height:0;perspective:1700px;overflow:hidden;cursor:grab;touch-action:none;background:radial-gradient(ellipse at 50% 40%,#244472,#0b1226 75%);--rx:50deg;--rz:38deg;--sc:.8}
+.hint{position:absolute;left:12px;bottom:8px;color:#9fd8ff;z-index:6;font-size:12px}
+.clk{position:absolute;left:12px;top:10px;z-index:6;background:#000a;color:#7dffb0;font:600 13px/1.5 Consolas,"Cascadia Mono",monospace;padding:6px 10px;border-radius:6px;border:1px solid #7df9ff55}
+.brand{position:absolute;right:12px;top:10px;z-index:6;background:#000a;color:#ffd36b;font-weight:700;font-size:14px;letter-spacing:.06em;padding:6px 12px;border-radius:6px;border:1px solid #ffd36b55}
+#floor{position:absolute;left:50%;top:50%;width:1060px;height:500px;margin:-250px 0 0 -530px;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateZ(var(--rz)) scale(var(--sc))}
+.carpet{position:absolute;inset:0;background:#16234a;border:6px solid #0a1230;border-radius:6px;transform:translateZ(-2px);background-image:linear-gradient(#ffffff14 1px,transparent 1px),linear-gradient(90deg,#ffffff14 1px,transparent 1px);background-size:28px 28px}
+#wires{position:absolute;left:0;top:0;overflow:visible;transform:translateZ(2px);pointer-events:none}
+#wires path{fill:none;stroke-width:3}
+#wires .w{stroke:#7df9ff;stroke-dasharray:7 7;opacity:.5}
+#wires .act{stroke:#ffe94a;opacity:1;stroke-width:4;animation:dash .6s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-14}}
+.room{position:absolute;width:180px;height:130px;transform-style:preserve-3d}
+.fl{position:absolute;inset:0;background:var(--c);border:3px solid #0007;border-radius:4px;background-image:linear-gradient(#fff4 1px,transparent 1px),linear-gradient(90deg,#fff4 1px,transparent 1px);background-size:20px 20px}
+.room.on .fl{animation:pulse .8s infinite alternate}
+@keyframes pulse{from{box-shadow:0 0 0 0 #ffe94a,inset 0 0 16px #fff6}to{box-shadow:0 0 20px 8px #ffe94a,inset 0 0 34px #fffd}}
+.wall{position:absolute;left:0;top:0;transform-origin:0 0;background:linear-gradient(#0004,#0007),var(--c);border:2px solid #000a;opacity:.95}
+.wb{width:180px;height:56px;transform:rotateX(90deg)}
+.wl{width:56px;height:130px;transform:rotateY(-90deg)}
+.dk{position:absolute;left:30px;top:36px;width:120px;height:22px;background:#8a5a2b;border:2px solid #000a;border-radius:2px;transform:translateZ(1px)}
+.bb{position:absolute;width:0;height:0;transform-style:preserve-3d}
+.bbi{position:absolute;bottom:0;left:-40px;width:80px;text-align:center;transform-origin:50% 100%;transform:rotateZ(calc(var(--rz)*-1)) rotateX(calc(var(--rx)*-1))}
+.bbi.w{left:-95px;width:190px}
+.em{font-size:34px;line-height:1.05;animation:bob 2.4s ease-in-out infinite}
+.room.on .em{animation-duration:.5s}.walk .em{animation-duration:.3s}
+@keyframes bob{50%{transform:translateY(-5px)}}
+.nm{display:inline-block;background:#000c;color:#fff;font-size:16px;font-weight:600;line-height:1.1;padding:1px 6px;border-radius:3px}
+.lb{display:inline-block;background:#0a0f20ee;color:#fff;border:2px solid var(--c);border-radius:6px;padding:2px 9px;text-align:center;font-size:18px;font-weight:600;line-height:1.2}
+.lb small{display:block;font-size:13px;font-weight:400;color:var(--c)}
+.room.on .lb{background:#ffe94a;color:#000}.room.on .lb small{color:#000}
+.bubb{display:none;background:#fff;color:#111;border:2px solid #000;border-radius:7px;box-shadow:3px 3px 0 #0008;font-size:15px;font-weight:500;line-height:1.25;padding:4px 8px;text-align:left}
+.drop{animation:drop .9s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes drop{from{transform:translateZ(300px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.em,.drop{animation:none}}
+/* panel kanan */
+#fun{background:#0c0c10;padding:8px 12px}
+.fb{display:flex;align-items:center;gap:8px;margin:3px 0;color:#cfe;font-size:13px}.fb span{width:104px}.fb div{height:12px;border-radius:3px;background:linear-gradient(90deg,#3dff7a,#ffe94a);transition:width .4s}.fb em{font-style:normal;color:#ffd666}
+.kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:8px;background:#0c0c10;border-top:1px solid #ffffff12}
+.kpi div{background:#ffffff0d;color:#a9b4c8;padding:4px 10px;border-radius:6px;font-size:12px}
+.kpi b{font-size:20px;display:block;color:#ffd666;font-weight:600;line-height:1.3}
+.term{flex:1;min-height:0;overflow:auto;background:#0c0c10;color:#d6d6dc;padding:8px 12px;font:12.5px/1.45 Consolas,"Cascadia Mono",monospace}
+.term p{margin-bottom:3px}
+.g{color:#4ade80}.r{color:#ff7b7b}.y{color:#ffd666}.c{color:#7dd3fc}
+#led{flex:1;min-height:0;overflow:auto;background:#0c0c10;color:#d6d6dc;font-size:12.5px}
+#led table{width:100%;border-collapse:collapse}#led td,#led th{padding:2px 12px;text-align:left;white-space:nowrap}
+#led th{color:#ffd666;position:sticky;top:0;background:#16171d;font-weight:600}
+#led tbody tr:nth-child(even){background:#ffffff08}.n{text-align:right!important}
+/* modal */
+.md{position:absolute;inset:0;background:#0009;z-index:50;display:none;align-items:center;justify-content:center}
+.md .win{width:1120px;max-height:820px;background:#1d1e24}
+.md .body{overflow:auto;background:#1d1e24;padding:16px;font-size:14px;line-height:1.5}
+.md h3{font-size:18px;font-weight:600;margin-bottom:6px}.md p{margin:4px 0}
+table.t{width:100%;border-collapse:collapse;margin:6px 0}.t td,.t th{padding:4px 10px;border-bottom:1px solid #ffffff14;text-align:left}
+.t th{background:#2d2f38;color:#fff;font-weight:600}
+.t tr.b td{font-weight:700;background:#ffffff0a}.t tr.big td{background:#60cdff26;font-size:17px;color:#9be3ff}.note{color:#97a0b3;margin-top:6px}
+.frm label{display:flex;justify-content:space-between;align-items:center;margin:6px 0}.frm h4{margin-top:12px;font-size:15px;font-weight:600}
+input{font:inherit;font-size:14px;width:100px;color:#fff;background:#2b2c33;border:1px solid #ffffff22;border-bottom:2px solid #60cdff;border-radius:4px;padding:4px 8px}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="main2">
+ <div class="L">
+  <div class="win"><div class="tb"><span>🏢 ALFIAN TOUR &amp; TRAVEL · Kantor AI 3D</span><span class="ctl"><i>─</i><i>▢</i><i>✕</i></span></div>
+   <div id="stage"><div class="clk" id="sclk">HARI 0<br>Belum mulai</div><div class="brand">ALFIAN TOUR &amp; TRAVEL</div><div id="floor"></div>
+   <div class="hint">🖱 seret = putar &nbsp;·&nbsp; roda = zoom &nbsp;·&nbsp; klik ruangan = detail</div></div></div>
+  <div class="win"><div class="tb"><span>📒 Buku Kas · arus kas real-time</span><span class="ctl"><i>─</i><i>▢</i><i>✕</i></span></div>
+   <div id="led"><table><thead><tr><th>Hari</th><th>Keterangan</th><th class="n">Masuk</th><th class="n">Keluar</th><th class="n">Saldo</th></tr></thead><tbody></tbody></table></div></div>
+ </div>
+ <div class="R">
+  <div class="win"><div class="tb"><span>📈 Funnel &amp; KPI</span><span class="ctl"><i>─</i><i>▢</i><i>✕</i></span></div><div id="fun"></div><div class="kpi" id="kp"></div></div>
+  <div class="win"><div class="tb"><span>🔎 Lead Feed · AI mencari jamaah</span><span class="ctl"><i>─</i><i>▢</i><i>✕</i></span></div><div class="term" id="feed"></div></div>
+  <div class="win"><div class="tb"><span>⌨ Terminal · log aktivitas</span><span class="ctl"><i>─</i><i>▢</i><i>✕</i></span></div><div class="term" id="log"></div></div>
+ </div>
+</div>
+<div class="task">
+ <div class="lf">Estimasi simulasi; angka acak seperti dunia nyata.</div>
+ <div class="mid">
+  <div class="start"><i></i><i></i><i></i><i></i></div>
+  <button class="st" id="play">▶ Mulai</button><button id="setup">⚙ Setup / Ulang</button><button id="rep">📊 Laporan</button><button id="snd">🔊 Efek</button><button id="mus">🎵 Musik</button><button id="cam">🎥 Kamera</button><button id="fs">⛶ Layar Penuh</button>
+  <select id="spd"><option value="1">x1</option><option value="2">x2</option><option value="4">x4</option><option value="8">x8</option></select>
+ </div>
+ <div class="rt"><span>AI-CPU ▮▮▮▮▯</span><span id="clk2"></span></div>
+</div>
+<div class="md" id="md"></div>
+</div>
+<script>
+const W=180,H=130,PX=262,PY=240,OX=40,OY=50;
+const $=s=>document.querySelector(s),floor=$("#floor"),st=$("#stage");
+const BASE={
+ owner:{n:"Owner & CEO",sh:"Owner",i:"👑",c:"#ffd36b",a:[["Pak Hendra","Owner","🧔"],["Bu Sinta","CEO","👩‍💼"]],t:"Menetapkan target, harga paket, dan membaca laporan harian."},
+ dir:{n:"Direksi",sh:"Direksi",i:"🏛️",c:"#c9a7ff",a:[["Dir. Ops","Direksi","👨‍💼"],["Dir. Keu","Direksi","👩‍💼"]],t:"Menyetujui budget iklan, margin paket, dan risiko."},
+ mkt:{n:"Marketing",sh:"Marketing",i:"📣",c:"#ff9ecb",a:[["Content","Konten","🧑‍🎨"],["Ads","Iklan","🧑‍💻"]],t:"Membuat konten, menjalankan iklan, mengirim lead ke Sales."},
+ sales:{n:"Sales",sh:"Sales",i:"🤝",c:"#ffb26b",a:[["Rani","Sales","👩‍💻"],["Budi","Sales","🧑‍💻"]],t:"Follow-up WhatsApp, presentasi paket, tangani keberatan, closing."},
+ close:{n:"Closing & Berangkat",sh:"Closing",i:"🕋",c:"#ff8a80",a:[["Manifest","Manifest","📋"],["Muthawif","Pembimbing","🧕"]],t:"Susun manifest, grup WA, manasik, antar ke bandara."},
+ ops:{n:"Operasional",sh:"Ops",i:"🛂",c:"#7ee8e0",a:[["Visa","Visa","📄"],["Tiket","Tiket+Hotel","✈️"]],t:"Urus visa, tiket pesawat, hotel, dan bus."},
+ fin:{n:"Finance",sh:"Finance",i:"💰",c:"#8ff0a4",a:[["Fajar","Kasir","🧮"],["Lisa","Audit","🧾"]],t:"Cek DP dan pelunasan, kirim invoice dan kuitansi."},
+ cs:{n:"Customer Service",sh:"CS",i:"🎧",c:"#8fd0ff",a:[["Dewi","CS","👩‍🎤"],["Raka","CS","🧑‍🎤"]],t:"Jawab pertanyaan, kumpulkan KTP, paspor, dan dokumen."}
+};
+
+const ORD0=["owner","dir","mkt","sales","close","ops","fin","cs"];
+let rooms=JSON.parse(JSON.stringify(BASE)),ORDER=[...ORD0];
+const pos=id=>{const i=ORDER.indexOf(id);return{x:OX+(i%4)*PX,y:OY+Math.floor(i/4)*PY}};
+const spot=id=>{const p=pos(id);return{x:p.x+W/2,y:p.y+H-24}};
+function route(a,b){
+ const A=spot(a),B=spot(b),ia=ORDER.indexOf(a),ib=ORDER.indexOf(b),ra=Math.floor(ia/4),rb=Math.floor(ib/4);
+ if(ra==rb&&Math.abs(ia%4-ib%4)>1){const cy=OY+ra*PY+H+22;return `M${A.x},${A.y}V${cy}H${B.x}V${B.y}`}
+ return `M${A.x},${A.y}L${B.x},${B.y}`}
+const bb=(x,y,z,h,c)=>`<div class="bb" style="left:${x}px;top:${y}px;transform:translateZ(${z}px)"><div class="bbi ${c}">${h}</div></div>`;
+function roomHTML(id,drop){
+ const r=rooms[id],p=pos(id),n=r.a.length;
+ let h=`<div class="room${drop?" drop":""}" id="r-${id}" style="left:${p.x}px;top:${p.y}px;--c:${r.c}"><div class="fl"></div><div class="wall wb"></div><div class="wall wl"></div><div class="dk"></div>`;
+ h+=bb(W/2,52,2,'<div class="em" style="font-size:24px;animation:none">🖥️</div>','');
+ r.a.forEach((a,j)=>h+=bb(W/2+(j-(n-1)/2)*74,92,1,`<div class="em">${a[2]}</div><div class="nm">${a[0]}</div>`,''));
+ h+=bb(W/2,6,64,`<div class="lb">${r.i} ${r.n}<small id="st-${id}">standby</small></div>`,"w");
+ h+=bb(W/2,118,54,`<div class="bubb" id="bu-${id}"></div>`,"w");
+ return h+"</div>"}
+
+const rnd=(a,b)=>a+Math.random()*(b-a),ri=(a,b)=>Math.floor(rnd(a,b+1)),pick=a=>a[ri(0,a.length-1)];
+const fm=n=>{const s=n<0?"-":"",a=Math.abs(n);return s+"Rp "+(a>=1e6?(a/1e6).toFixed(a>=1e8?0:1).replace(".",",")+" jt":a>=1e3?Math.round(a/1e3)+" rb":Math.round(a))};
+const rp=n=>(n<0?"-":"")+"Rp "+Math.abs(Math.round(n)).toLocaleString("id-ID");
+const FN=["Siti","Aminah","Dewi","Rina","Fatimah","Nurul","Lilis","Maya","Yuni","Ratna"],MN=["Ahmad","Budi","Hasan","Yusuf","Hendra","Dedi","Agus","Ridwan","Asep","Iwan"],LN=["Santoso","Wijaya","Hidayat","Nugraha","Rahman","Kusuma","Lestari","Permana"],CT=["Bandung","Jakarta","Bekasi","Depok","Bogor","Cimahi","Garut","Cirebon","Sumedang","Tasikmalaya"];
+const CH={on:{n:"Online (Meta Ads)",ic:"📱",c:[3e4,6e4],v:[.03,.06],fee:75e4,room:"mkt",src:"Meta Ads"},
+ ref:{n:"Referral & Alumni",ic:"👥",c:[0,0],v:[.18,.3],fee:1e6,room:"sales",src:"referral alumni"},
+ off:{n:"Offline (Event/Seminar)",ic:"🏢",c:[12e4,2e5],v:[.08,.14],fee:75e4,room:"mkt",src:"event/seminar"}};
+const ACC={1100:"Kas & Bank",1200:"Uang Muka Vendor",2100:"Uang Muka Jamaah",3100:"Modal Pemilik",4100:"Pendapatan Paket Umroh",4200:"Pendapatan Denda Pembatalan",5100:"HPP Paket (tiket, hotel, visa, muthawif)",6100:"Beban Iklan",6200:"Beban Komisi & Referral",6250:"Beban Event Offline",6300:"Beban Langganan AI & Tools",6400:"Biaya Admin Pembayaran"};
+const ADS=["🔍 Ads AI: target muslim 40-65 th minat umroh","📣 Ads AI: iklan 'Umroh Hemat' tayang","🎬 Content AI: video testimoni jamaah tayang","📊 Ads AI: matikan iklan CTR rendah, scale yang menang"];
+let P={},cfg={nm:"ALFIAN TOUR & TRAVEL",on:10,ref:3,off:2,pmin:27,pmax:48,ads:21},S=null,timer=null,running=false,spd=1,flying=0,bt={},sfxOn=true,AC=null;
+function roll(){for(const k in CH)P[k]={cpl:Math.round(rnd(...CH[k].c)/1e3)*1e3,cv:rnd(...CH[k].v)};P.hpp=rnd(.84,.88);P.r1=rnd(.72,.86);P.r2=rnd(.35,.5)}
+roll();
+/* ===== SUARA ===== */
+function ac(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state=="suspended")AC.resume();return AC}
+function tone(f,t0,dur,type,vol,f2){const a=ac(),o=a.createOscillator(),g=a.createGain(),t=a.currentTime+t0;o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur+.02)}
+const SFX={
+ proc:()=>[0,.07,.14].forEach((t,i)=>tone(500+i*180+Math.random()*60,t,.06,"square",.03)),
+ lead:()=>tone(700+Math.random()*500,0,.1,"triangle",.06,1300),
+ cling:()=>{tone(1568,0,.5,"sine",.1);tone(2093,.09,.7,"sine",.09);tone(3136,.09,.4,"sine",.03)},
+ cash:()=>{tone(1318,0,.1,"square",.04);tone(1976,.1,.5,"sine",.09);tone(2637,.2,.6,"sine",.06)},
+ out:()=>tone(300,0,.18,"sawtooth",.04,150),
+ warn:()=>{tone(220,0,.25,"sawtooth",.06);tone(180,.2,.3,"sawtooth",.06)},
+ fan:()=>[523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,i*.12,.45,"triangle",.08)),
+ boot:()=>[220,330,440,660,880].forEach((f,i)=>tone(f,i*.09,.15,"square",.04))};
+const sfx=n=>{if(sfxOn&&AC)try{SFX[n]()}catch(e){}};
+function speak(){} /* suara orang dihapus */
+/* ===== UTIL UI ===== */
+const dt=(d,w)=>new Date(S.t0.getTime()+d*864e5).toLocaleDateString("id-ID",w?{weekday:"short",day:"numeric",month:"short",year:"numeric"}:{day:"numeric",month:"short",year:"numeric"});
+function modal(h){const m=$("#md");m.innerHTML=h;m.style.display="flex"}
+function closeModal(){$("#md").style.display="none"}
+function app(id,cls,t){const e=$(id),p=document.createElement("p");p.className=cls;p.textContent=t;e.appendChild(p);if(e.children.length>160)e.firstChild.remove();e.scrollTop=e.scrollHeight}
+const lg=(c,t)=>app("#log",c,`[H${S?S.d:0}] ${t}`),fd=(c,t)=>app("#feed",c,t);
+function bub(id,t){const e=$("#bu-"+id),r=$("#r-"+id);if(!e)return;e.style.display="block";e.textContent=t;r.classList.add("on");clearTimeout(bt[id]);bt[id]=setTimeout(()=>{e.style.display="none";r.classList.remove("on")},Math.max(1000,1900/spd))}
+function setSt(id,t){const e=$("#st-"+id);if(e)e.textContent=t}
+function walk(el,d,ms){return new Promise(res=>{const sv=$("#wires"),p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d",d);p.setAttribute("fill","none");sv.appendChild(p);const L=p.getTotalLength(),t0=performance.now();(function f(n){const k=Math.min(1,(n-t0)/ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2,pt=p.getPointAtLength(L*e);el.style.left=pt.x+"px";el.style.top=pt.y+"px";k<1?requestAnimationFrame(f):(p.remove(),res())})(t0)})}
+function fly(a,b,em,ms){if(flying>8||!$("#r-"+b))return;flying++;const el=document.createElement("div"),k=a&&[a,b].sort().join("|"),ed=k&&$(`#edges [data-k="${k}"]`);el.className="bb";el.style.transform="translateZ(5px)";el.innerHTML=`<div class="bbi"><div class="em" style="font-size:28px">${em}</div></div>`;floor.appendChild(el);if(ed)ed.classList.add("act");
+ const s=spot(b);walk(el,a?route(a,b):`M-40,${s.y}L${s.x},${s.y}`,Math.max(350,(ms||1000)/spd)).then(()=>{el.remove();flying--;if(ed)ed.classList.remove("act")})}
+function buildScene(){
+ rooms=JSON.parse(JSON.stringify(BASE));ORDER=[...ORD0];
+ const E=[["owner","dir"],["dir","mkt"],["mkt","sales"],["sales","fin"],["fin","cs"],["sales","cs"],["fin","ops"],["ops","close"]];
+ floor.innerHTML='<div class="carpet"></div><svg id="wires" width="1060" height="500"><g id="edges">'+E.map(([a,b])=>`<path class="w" data-k="${[a,b].sort().join("|")}" d="${route(a,b)}"/>`).join("")+'</g></svg>'+ORDER.map(id=>roomHTML(id)).join("");
+ $("#led tbody").innerHTML="";$("#log").innerHTML="";$("#feed").innerHTML="";$("#fun").innerHTML="";$("#kp").innerHTML=""}
+/* ===== AKUNTANSI ===== */
+const b=a=>S.bal[a]||0,np=()=>-[4100,4200,5100,6100,6200,6250,6300,6400].reduce((s,a)=>s+b(a),0);
+function post(desc,lines,cat){let cash=0;lines.forEach(([a,v])=>{S.bal[a]=(S.bal[a]||0)+v;if(a==1100)cash+=v});S.jr.push({d:S.d,desc,lines});
+ if(cash){S.cf[cat]=(S.cf[cat]||0)+cash;const tb=$("#led tbody"),tr=document.createElement("tr");tr.innerHTML=`<td>H${S.d}</td><td>${desc}</td><td class="n g">${cash>0?fm(cash):""}</td><td class="n r">${cash<0?fm(-cash):""}</td><td class="n">${fm(b(1100))}</td>`;tb.insertBefore(tr,tb.firstChild);if(tb.children.length>60)tb.lastChild.remove()}}
+/* ===== PLAN & SETUP ===== */
+function readCfg(){const v=i=>Math.max(0,+$("#t_"+i).value||0);cfg.nm=$("#t_nm").value||"Travel";cfg.on=v("on");cfg.ref=v("ref");cfg.off=v("off");cfg.pmin=v("pmin");cfg.pmax=Math.max(cfg.pmin,v("pmax"));cfg.ads=Math.max(7,v("ads"));cfg.dep=cfg.ads+40}
+function plan(){const c=cfg;c.dep=c.ads+40;let h="",ads=0,T=0,kom=0;
+ for(const k in CH){const t=c[k],l=t?Math.ceil(t/P[k].cv):0,bd=l*P[k].cpl;ads+=bd;T+=t;kom+=t*CH[k].fee;h+=`<tr><td>${CH[k].ic} ${CH[k].n}</td><td class="n">${t}</td><td class="n">${(P[k].cv*100).toFixed(1)}%</td><td class="n">${rp(P[k].cpl)}</td><td class="n">${l}</td><td class="n">${rp(bd)}</td></tr>`}
+ c.T=T;const om=T*(c.pmin+c.pmax)/2*1e6,tools=Math.ceil(c.dep/7)*7e5,lb=om-om*P.hpp-ads-kom-tools-om*.007;
+ return `<h3>📐 Rencana otomatis (dihitung mundur dari target)</h3><table class="t"><tr><th>Channel</th><th class="n">Target</th><th class="n">Konversi lead→closing</th><th class="n">Biaya/lead</th><th class="n">Lead dibutuhkan</th><th class="n">Budget</th></tr>${h}</table>
+ <p>Total budget iklan & event: <b>${rp(ads)}</b> · Komisi: ${rp(kom)} · HPP: ${(P.hpp*100).toFixed(0)}% dari harga</p>
+ <p>Total target: <b>${T} jamaah</b> · Estimasi omzet: <b>${rp(om)}</b> · Estimasi laba bersih: <b>${rp(lb)}</b></p>
+ <p>CAC rata-rata: ${T?rp((ads+kom)/T):"-"} per jamaah · Keberangkatan: hari ke-${c.dep}</p><p class="note">Angka hasil simulasi akan bervariasi (acak) di sekitar rencana ini, seperti dunia nyata.</p>`}
+function openSetup(){stopRun();const c=cfg,f=(i,l,v)=>`<label>${l}<input id="t_${i}" type="number" min="0" value="${v}"></label>`;
+ modal(`<div class="win"><div class="tb"><span>⚙ Setup_Kampanye.exe</span><span class="cx" onclick="closeModal()">✕</span></div><div class="body"><div style="display:grid;grid-template-columns:340px 1fr;gap:16px"><div class="frm">
+ <label>Nama usaha<input id="t_nm" style="width:230px" value="${c.nm}"></label><h4>🎯 Target jamaah per channel</h4>${f("on","Online (Meta Ads)",c.on)}${f("ref","Referral & Alumni",c.ref)}${f("off","Offline (Event)",c.off)}
+ <h4>💳 Harga paket (acak per jamaah)</h4>${f("pmin","Minimum (juta)",c.pmin)}${f("pmax","Maksimum (juta)",c.pmax)}${f("ads","Durasi iklan (hari)",c.ads)}
+ <p style="margin-top:10px"><button id="reroll">🎲 Acak kondisi pasar</button></p></div><div id="planbox"></div></div>
+ <p style="margin-top:10px"><button class="st" id="go">▶ Mulai Simulasi</button></p></div></div>`);
+ const rf=()=>{readCfg();$("#planbox").innerHTML=plan()};document.querySelectorAll("#md input").forEach(i=>i.oninput=rf);$("#reroll").onclick=()=>{roll();rf()};$("#go").onclick=()=>{rf();if(cfg.T)start()};rf()}
+/* ===== SIMULASI ===== */
+function start(){closeModal();ac();sfx("boot");buildScene();
+ const sp=Object.keys(CH).reduce((s,k)=>s+(cfg[k]?Math.ceil(cfg[k]/P[k].cv)*P[k].cpl:0),0);
+ S={d:0,end:cfg.dep+2,leads:[],bal:{},cf:{},jr:[],stat:{},boost:1,booked:0,dep:0,cancel:0,id:0,t0:new Date()};
+ for(const k in CH)S.stat[k]={sp:0,le:0,co:0,pr:0,cl:0,lu:0};
+ S.modal=Math.ceil((sp*1.25+1e7)/5e6)*5e6;post("Setoran modal pemilik",[[1100,S.modal],[3100,-S.modal]],"Modal pemilik");
+ lg("y",`🚀 ${cfg.nm}: target ${cfg.T} jamaah. Budget iklan & event ${rp(sp)}. Modal ${rp(S.modal)}.`);
+ speak(`Simulasi dimulai. Target ${cfg.T} jamaah. Budget iklan ${Math.round(sp/1e6)} juta rupiah.`,true);
+ running=true;setBtn();ui();loop()}
+function loop(){clearInterval(timer);timer=setInterval(day,1500/spd)}
+function stopRun(){clearInterval(timer);running=false;setBtn()}
+function mkLead(k,d){const f=Math.random()<.55,nm=(f?"Bu "+pick(FN):"Pak "+pick(MN))+" "+pick(LN);return{id:++S.id,k,st:0,nx:d+ri(0,1),name:nm,city:pick(CT),em:f?"🧕":"👳"}}
+function drop(l,why,s){l.done=1;fd("",`✖ ${l.name}: ${why}`)}
+function adv(l,d,ev){const s=S.stat[l.k];
+ if(l.st==0){if(Math.random()<P.r1){l.st=1;l.nx=d+ri(1,2);s.co++;ev.co++;if(ev.co<3){fly("mkt","sales",l.em,800);bub("sales",`Sales AI follow-up WA ke ${l.name}`)}}else drop(l,"tidak merespon")}
+ else if(l.st==1){if(Math.random()<P.r2){l.st=2;l.nx=d+ri(1,4);s.pr++}else drop(l,"belum berminat")}
+ else if(l.st==2){const pc=Math.min(.75,P[l.k].cv/(P.r1*P.r2));if(d>cfg.dep-21)drop(l,"jadwal penuh, dialihkan ke periode berikutnya");else if(Math.random()<pc)closing(l,d,s,ev);else drop(l,pick(["pikir-pikir dulu","bandingkan travel lain","budget belum cukup"]))}
+ else if(l.st==3){l.st=4;l.nx=Math.min(cfg.dep-8,d+ri(7,18));fly("fin","cs","📄",800);bub("cs",`CS AI: dokumen ${l.name} lengkap (KTP, paspor, foto)`)}
+ else if(l.st==4){
+  if(Math.random()<.06){const rf=Math.round(l.dp*.8);post(`Refund batal ${l.name} (denda 20%)`,[[2100,l.dp],[1100,-rf],[4200,-(l.dp-rf)]],"Refund pembatalan");l.done=1;S.cancel++;fd("r",`❌ BATAL ${l.name}: refund ${fm(rf)}`);lg("r",`${l.name} membatalkan. Refund ${fm(rf)}, denda masuk pendapatan.`);bub("fin",`Finance: refund ${l.name} ${fm(rf)}`);sfx("warn")}
+  else{const rest=l.price-l.dp,fee=Math.round(rest*.007);post(`Pelunasan ${l.name}`,[[1100,rest-fee],[6400,fee],[2100,-rest]],"Penerimaan jamaah (net admin)");l.st=5;l.nx=d+1;s.lu++;ev.lu++;fd("g",`💰 LUNAS ${l.name} ${fm(rest)}`);fly("cs","fin","💰",800);bub("fin",`Finance: pelunasan ${l.name} ${fm(rest)}`);sfx("cash")}}
+ else if(l.st==5){l.hpp=Math.round(l.price*P.hpp);l.v1=Math.round(l.hpp/2);post(`Vendor: DP tiket & hotel ${l.name}`,[[1200,l.v1],[1100,-l.v1]],"Pembayaran vendor");l.st=6;l.nx=1e9;fly("fin","ops","🧾",800);bub("ops",`Ops AI: visa & tiket ${l.name} diproses`);sfx("out")}}
+function closing(l,d,s,ev){
+ const price=Math.round(rnd(cfg.pmin,cfg.pmax)*2)/2*1e6,t=(price/1e6-cfg.pmin)/((cfg.pmax-cfg.pmin)||1);
+ l.price=price;l.pk=t<.34?"Umroh Reguler 9 Hari":t<.67?"Umroh Plus 12 Hari":"Umroh VIP 12 Hari";l.dp=Math.max(5e6,Math.round(price*.25/5e5)*5e5);
+ const fee=Math.round(l.dp*.007),kf=CH[l.k].fee;
+ post(`DP ${l.name} - ${l.pk}`,[[1100,l.dp-fee],[6400,fee],[2100,-l.dp]],"Penerimaan jamaah (net admin)");
+ post(`Komisi ${l.k=="ref"?"referral":"sales"} ${l.name}`,[[6200,kf],[1100,-kf]],"Komisi & referral");
+ l.st=3;l.nx=d+ri(1,2);s.cl++;ev.cl++;S.booked+=price;
+ fd("g",`✅ CLOSING ${l.name} · ${l.pk} ${fm(price)} · DP ${fm(l.dp)}`);lg("g",`CLOSING ${l.name} (${CH[l.k].src}) ${l.pk} ${fm(price)}`);
+ fly("sales","fin","💵",800);bub("sales",`🎉 Closing ${l.name}! ${l.pk}`);bub("fin",`Finance: DP ${fm(l.dp)} masuk`);sfx("cling");setTimeout(()=>sfx("cash"),380);
+ if(!ev.said){ev.said=1;speak(`Closing! ${l.name}, ${l.pk}, uang muka ${Math.round(l.dp/1e6)} juta rupiah.`)}}
+function day(){
+ const d=++S.d,ev={sp:0,le:0,co:0,cl:0,lu:0},all=Array.from({length:cfg.ads},(_,i)=>i+1);
+ sfx("proc");
+ if(d%7==1)post("Langganan AI & tools (mingguan)",[[6300,7e5],[1100,-7e5]],"Langganan AI & tools");
+ if(d<=cfg.ads)for(const k in CH){const t=cfg[k];if(!t)continue;const dl=k=="off"?all.filter(x=>x%7==5):all;if(!dl.includes(d))continue;
+  const n=Math.max(0,Math.round(Math.ceil(t/P[k].cv)/dl.length*(k=="on"?S.boost:1)*rnd(.7,1.3))),sp=Math.round(n*P[k].cpl*rnd(.9,1.12)/1e3)*1e3;
+  if(sp){post(`${CH[k].ic} ${k=="off"?"Biaya event offline":"Iklan Meta Ads"} (hari ${d})`,[[k=="off"?6250:6100,sp],[1100,-sp]],"Iklan & event");sfx("out")}
+  S.stat[k].sp+=sp;S.stat[k].le+=n;ev.sp+=sp;ev.le+=n;
+  for(let i=0;i<n;i++){const l=mkLead(k,d);S.leads.push(l);if(i<2)fd("",`${CH[k].ic} ${l.name} (${l.city}) masuk via ${CH[k].src}`)}
+  if(n>2)fd("c",`   ...+${n-2} lead lain dari ${CH[k].n}`);
+  if(n){sfx("lead");fly(null,"mkt",pick(["🧕","👳","👵","👴"]),900);bub(CH[k].room,k=="on"?`${pick(ADS)} · ${fm(sp)} → ${n} lead`:k=="ref"?`Sales AI hubungi alumni: +${n} lead referral`:`Booth seminar: ${n} lead terkumpul`)}}
+ for(const l of S.leads)if(!l.done&&l.nx<=d)adv(l,d,ev);
+ if(d==cfg.dep-3){const ls=S.leads.filter(l=>l.st==6),sum=ls.reduce((s,l)=>s+l.hpp-l.v1,0);if(sum){post(`Pelunasan vendor H-3 (${ls.length} jamaah)`,[[1200,sum],[1100,-sum]],"Pembayaran vendor");bub("ops",`Ops AI: lunasi vendor ${fm(sum)}`);bub("fin","Finance: transfer vendor H-3");sfx("out")}}
+ if(d==cfg.dep){const ls=S.leads.filter(l=>l.st==6),n=ls.length;if(n){const sp=ls.reduce((s,l)=>s+l.price,0),sh=ls.reduce((s,l)=>s+l.hpp,0);post(`Berangkat ${n} jamaah: pengakuan pendapatan & HPP`,[[2100,sp],[4100,-sp],[5100,sh],[1200,-sh]],"-");ls.forEach(l=>{l.st=7;l.done=1});S.dep+=n;
+  fd("g",`✈️ BERANGKAT: ${n} jamaah`);lg("g",`✈️ ${n} jamaah berangkat. Pendapatan ${fm(sp)} diakui.`);for(let i=0;i<3;i++)fly("ops","close","✈️",1100);bub("close",`Manifest final: ${n} jamaah berangkat!`);sfx("fan");speak(`${n} jamaah resmi berangkat. Alhamdulillah.`,true)}}
+ if(d%7==0&&d<=cfg.ads){let tl=0,pl=0;for(const k in CH){tl+=S.stat[k].le;if(cfg[k])pl+=Math.ceil(cfg[k]/P[k].cv)}const ex=pl*d/cfg.ads,r=tl/ex;let m;
+  if(r<.88&&d<cfg.ads-3){S.boost=1.2;m="lead di bawah rencana, Ads AI naikkan budget +20%"}else if(r>1.15){S.boost=.9;m="lead di atas rencana, budget diturunkan 10%"}else{S.boost=1;m="performa sesuai rencana"}
+  lg("y",`📋 REVIEW MINGGU ${d/7}: lead ${tl} vs rencana ${Math.round(ex)} → ${m}`);bub("dir",`Direksi: minggu ${d/7}, ${m}`);fly("dir","owner","📊",900);bub("owner",`Owner: kas ${fm(b(1100))}`);sfx("cling")}
+ if(ev.sp||ev.le||ev.co||ev.cl||ev.lu)lg("",`${dt(d)} · iklan ${fm(ev.sp)} · +${ev.le} lead · ${ev.co} terhubung · ${ev.cl} closing · ${ev.lu} lunas`);
+ ui();if(d>=S.end)finish()}
+function ui(){
+ const A=Object.values(S.stat),sm=f=>A.reduce((s,x)=>s+x[f],0),le=sm("le"),co=sm("co"),pr=sm("pr"),cl=sm("cl"),lu=sm("lu"),sp=sm("sp"),n=np();
+ const rows=[["Lead",le],["Terhubung",co],["Prospek",pr],["Closing (DP)",cl],["Lunas",lu],["Berangkat",S.dep]];
+ $("#fun").innerHTML=rows.map(([x,v],i)=>`<div class="fb"><span>${x}</span><div style="width:${v?Math.max(3,v/Math.max(le,1)*300):0}px"></div><em>${v}${i&&rows[i-1][1]?` (${Math.round(v/rows[i-1][1]*100)}%)`:""}</em></div>`).join("");
+ $("#kp").innerHTML=[[fm(sp),"Iklan+Event"],[le,"Lead · CPL "+(le?fm(sp/le):"-")],[`${cl}/${cfg.T}`,"Closing/target"],[fm(S.booked),"Omzet booking"],[fm(b(1100)),"Kas"],[fm(n),"Laba bersih"]].map(([v,l])=>`<div><b>${v}</b>${l}</div>`).join("");
+ $("#sclk").innerHTML=`HARI ${S.d}/${S.end}<br>${dt(S.d,1)}<br>Berangkat H-${Math.max(0,cfg.dep-S.d)}`;
+ const L=S.leads.filter(l=>!l.done),c=(a,z)=>L.filter(l=>l.st>=a&&l.st<=z).length;
+ setSt("mkt",S.d<=cfg.ads?"🔍 mencari jamaah":"iklan selesai");setSt("sales",c(0,2)+" antrian");setSt("cs",c(3,3)+" dokumen");setSt("fin",c(4,4)+" tunggu lunas");setSt("ops",c(5,6)+" diproses");setSt("close",S.dep+" berangkat");setSt("owner","memantau");setSt("dir","review mingguan")}
+function finish(){stopRun();const n=np();bub("owner","Laporan akhir siap!");sfx("fan");lg("y",`🏁 SELESAI: ${S.dep} jamaah berangkat (target ${cfg.T}). Laba bersih ${fm(n)}.`);
+ speak(`Simulasi selesai. ${S.dep} jamaah berangkat dari target ${cfg.T}. Laba bersih ${Math.round(n/1e6)} juta rupiah.`,true);setTimeout(()=>openReport("lr"),2200)}
+/* ===== LAPORAN ===== */
+const r=(n,v,c)=>`<tr class="${c||""}"><td>${n}</td><td class="n">${rp(v)}</td></tr>`;
+const REP={
+ lr:()=>{const rev=-b(4100),pen=-b(4200),tr=rev+pen,h=b(5100),gp=tr-h,ex=[6100,6200,6250,6300,6400],te=ex.reduce((s,a)=>s+b(a),0);
+  return `<h3>Laporan Laba Rugi · ${cfg.nm}</h3><p>${dt(0)} s/d ${dt(S.d)} (hari ke-${S.d})</p><table class="t">${r("Pendapatan Paket Umroh",rev)+r("Pendapatan Denda Pembatalan",pen)+r("Total Pendapatan",tr,"b")+r("HPP (tiket, hotel, visa, muthawif)",-h)+r("Laba Kotor",gp,"b")+ex.map(a=>r(ACC[a],-b(a))).join("")+r("Total Beban Operasional",-te,"b")+r("LABA (RUGI) BERSIH",gp-te,"b big")}</table>
+  <p>Margin kotor ${tr?(gp/tr*100).toFixed(1):0}% · margin bersih ${tr?((gp-te)/tr*100).toFixed(1):0}%</p><p class="note">Pendapatan & HPP diakui saat jamaah berangkat (basis akrual). Uang muka jamaah yang belum berangkat: ${rp(-b(2100))}. Belum termasuk pajak.</p>`},
+ nr:()=>{const ta=b(1100)+b(1200),le=-b(2100),eq=-b(3100)+np();
+  return `<h3>Neraca (Posisi Keuangan) · ${dt(S.d)}</h3><table class="t">${`<tr class="b"><td colspan="2">ASET</td></tr>`+r("Kas & Bank",b(1100))+r("Uang Muka Vendor",b(1200))+r("Total Aset",ta,"b")+`<tr class="b"><td colspan="2">LIABILITAS</td></tr>`+r("Uang Muka Jamaah",le)+`<tr class="b"><td colspan="2">EKUITAS</td></tr>`+r("Modal Pemilik",-b(3100))+r("Laba Berjalan",np())+r("Total Liabilitas + Ekuitas",le+eq,"b")}</table><p>${Math.abs(ta-le-eq)<1?"✔ Neraca seimbang (Aset = Liabilitas + Ekuitas)":"⚠ Tidak seimbang"}</p>`},
+ ak:()=>{const k=Object.entries(S.cf).sort((a,b2)=>b2[1]-a[1]),net=k.reduce((s,x)=>s+x[1],0);
+  return `<h3>Laporan Arus Kas</h3><table class="t">${k.map(([n,v])=>r(n,v)).join("")+r("Kenaikan (penurunan) kas bersih",net,"b")+r("Saldo kas akhir",b(1100),"b big")}</table><p class="note">Arus kas berbeda dari laba: DP & pelunasan masuk dulu, vendor dibayar bertahap, pendapatan baru diakui saat berangkat.</p>`},
+ kp:()=>{let h="",T={t:0,le:0,co:0,pr:0,cl:0,sp:0,kf:0};for(const k in CH){const s=S.stat[k],kf=s.cl*CH[k].fee;h+=`<tr><td>${CH[k].ic} ${CH[k].n}</td><td class="n">${cfg[k]}</td><td class="n">${s.le}</td><td class="n">${s.co}</td><td class="n">${s.pr}</td><td class="n">${s.cl}</td><td class="n">${s.le?(s.cl/s.le*100).toFixed(1):0}%</td><td class="n">${rp(s.sp)}</td><td class="n">${s.le?rp(s.sp/s.le):"-"}</td><td class="n">${s.cl?rp((s.sp+kf)/s.cl):"-"}</td></tr>`;T.t+=cfg[k];T.le+=s.le;T.co+=s.co;T.pr+=s.pr;T.cl+=s.cl;T.sp+=s.sp;T.kf+=kf}
+  return `<h3>Funnel & KPI Marketing</h3><table class="t"><tr><th>Channel</th><th class="n">Target</th><th class="n">Lead</th><th class="n">Terhubung</th><th class="n">Prospek</th><th class="n">Closing</th><th class="n">Konversi</th><th class="n">Biaya</th><th class="n">CPL</th><th class="n">CAC</th></tr>${h}</table>
+  <p>Pencapaian target: <b>${T.cl}/${T.t}</b> (${T.t?Math.round(T.cl/T.t*100):0}%) · Batal: ${S.cancel} · Berangkat: ${S.dep}</p><p>ROAS (omzet booking / biaya iklan & event): <b>${T.sp?(S.booked/T.sp).toFixed(1)+"x":"-"}</b> · CAC rata-rata: <b>${T.cl?rp((T.sp+T.kf)/T.cl):"-"}</b> · Rata-rata harga paket: ${T.cl?rp(S.booked/T.cl):"-"}</p>`},
+ jr:()=>`<h3>Jurnal Umum (${S.jr.length} transaksi)</h3><table class="t"><tr><th>Hari</th><th>Keterangan</th><th>Akun</th><th class="n">Debit</th><th class="n">Kredit</th></tr>${S.jr.slice(-250).map(j=>j.lines.map((x,i)=>`<tr><td>${i?"":"H"+j.d}</td><td>${i?"":j.desc}</td><td>${x[0]} ${ACC[x[0]]}</td><td class="n">${x[1]>0?rp(x[1]):""}</td><td class="n">${x[1]<0?rp(-x[1]):""}</td></tr>`).join("")).join("")}</table>`};
+function openReport(tab){if(!S)return openSetup();const T=[["lr","Laba Rugi"],["nr","Neraca"],["ak","Arus Kas"],["kp","Funnel & KPI"],["jr","Jurnal"]];
+ modal(`<div class="win"><div class="tb"><span>📊 Laporan_Keuangan.xls · ${cfg.nm}</span><span class="cx" onclick="closeModal()">✕</span></div><div style="padding:4px;display:flex;gap:4px">${T.map(t=>`<button class="${t[0]==tab?"st":""}" onclick="openReport('${t[0]}')">${t[1]}</button>`).join("")}<button style="margin-left:auto" onclick="csv()">⬇ Jurnal CSV</button><button onclick="closeModal()">Tutup</button></div><div class="body" style="max-height:680px">${REP[tab]()}</div></div>`)}
+function csv(){let o="Hari,Keterangan,Akun,Debit,Kredit\n";S.jr.forEach(j=>j.lines.forEach(x=>o+=`${j.d},"${j.desc}",${x[0]} ${ACC[x[0]]},${x[1]>0?x[1]:""},${x[1]<0?-x[1]:""}\n`));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([o],{type:"text/csv"}));a.download="jurnal-umum.csv";a.click()}
+/* ===== KONTROL ===== */
+function setBtn(){$("#play").textContent=running?"⏸ Jeda":!S?"▶ Mulai":S.d>=S.end?"📊 Lihat Laporan":"▶ Lanjut"}
+$("#play").onclick=()=>{if(!S)return openSetup();if(S.d>=S.end)return openReport("lr");ac();running=!running;setBtn();running?loop():clearInterval(timer)};
+$("#setup").onclick=openSetup;$("#rep").onclick=()=>openReport("lr");
+$("#snd").onclick=e=>{sfxOn=!sfxOn;e.target.textContent=sfxOn?"🔊 Efek":"🔇 Efek"};
+$("#mus").onclick=e=>{mus.on=!mus.on;if(mus.on)musicStart();else musicStop();e.target.textContent=mus.on?"🎵 Musik":"🔇 Musik"};
+$("#spd").onchange=e=>{spd=+e.target.value;if(running)loop()};
+const tick=()=>{const n=new Date();$("#clk2").innerHTML=n.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+"<br>"+n.toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"})};tick();setInterval(tick,1000);
+let cam={rx:50,rz:38,sc:.8},drag=null,moved=0;
+const apply=()=>{st.style.setProperty("--rx",cam.rx+"deg");st.style.setProperty("--rz",cam.rz+"deg");st.style.setProperty("--sc",cam.sc)};
+$("#cam").onclick=()=>{cam={rx:50,rz:38,sc:.8};apply()};
+st.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY};moved=0});
+addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};moved+=Math.abs(dx)+Math.abs(dy);cam.rz=Math.min(75,Math.max(15,cam.rz+dx*.3));cam.rx=Math.min(75,Math.max(35,cam.rx-dy*.2));apply()});
+addEventListener("pointerup",()=>drag=null);
+st.addEventListener("wheel",e=>{e.preventDefault();cam.sc=Math.min(1.3,Math.max(.5,cam.sc-e.deltaY*.0008));apply()},{passive:false});
+
+st.addEventListener("click",e=>{if(moved>6)return;const m=e.target.closest(".room");if(!m)return;const x=rooms[m.id.slice(2)];lg("c",`${x.i} ${x.n}: ${x.t} (AI: ${x.a.map(a=>a[0]).join(", ")})`)});
+
+/* ===== MUSIK LATAR (robot / synth ambient, tanpa suara orang) ===== */
+let musBus=null,noiseBuf=null,mus={on:true,step:0,next:0,tid:null};
+function musInit(){const a=ac();if(musBus)return;musBus=a.createGain();musBus.gain.value=.55;const lp=a.createBiquadFilter();lp.type="lowpass";lp.frequency.value=5200;const cp=a.createDynamicsCompressor();musBus.connect(lp);lp.connect(cp);cp.connect(a.destination);const n=a.sampleRate,buf=a.createBuffer(1,n,n),d=buf.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;noiseBuf=buf}
+function mn(f,t,dur,type,vol,o){o=o||{};const a=AC,os=a.createOscillator(),g=a.createGain(),fl=a.createBiquadFilter();os.type=type;os.frequency.setValueAtTime(f,t);if(o.f2)os.frequency.exponentialRampToValueAtTime(o.f2,t+dur);fl.type="lowpass";fl.frequency.setValueAtTime(o.fc||2000,t);if(o.fc2)fl.frequency.exponentialRampToValueAtTime(o.fc2,t+dur);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol,t+(o.at||.01));g.gain.exponentialRampToValueAtTime(.0001,t+dur);os.connect(fl);fl.connect(g);g.connect(musBus);os.start(t);os.stop(t+dur+.05)}
+function hat(t,vol){const a=AC,s=a.createBufferSource(),g=a.createGain(),f=a.createBiquadFilter();s.buffer=noiseBuf;f.type="highpass";f.frequency.value=7000;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+.05);s.connect(f);f.connect(g);g.connect(musBus);s.start(t);s.stop(t+.06)}
+const ROOT=[110,87.31,130.81,98],CHORD=[[0,3,7,12],[0,4,7,12],[0,4,7,12],[0,4,7,12]],ARP=[0,1,2,3,2,1,2,3],PENT=[0,3,5,7,10,12,15],hz=(f,x)=>f*Math.pow(2,x/12);
+function musStep(s,t){const bar=Math.floor(s/16)%4,k=s%16,r=ROOT[bar],ch=CHORD[bar];
+ if(k==0)ch.slice(0,3).forEach(x=>mn(hz(r*2,x),t,2.6,"triangle",.05,{fc:1200,at:.4}));
+ if(k%8==0){mn(r,t,.55,"sine",.2,{fc:400});mn(110,t,.14,"sine",.3,{f2:42,fc:600})}
+ if(k==6||k==14)mn(r,t,.2,"sawtooth",.05,{fc:500});
+ if(k%2==0)mn(hz(r*4,ch[ARP[k/2]]),t,.22,"sawtooth",.04,{fc:3200,fc2:600});
+ if(k%2==1)hat(t,.03);if(k%4==2)hat(t,.045);
+ if(k==14&&Math.random()<.6){const b=hz(r*8,pick(PENT));mn(b,t,.09,"square",.035,{fc:3500});mn(b*1.5,t+.11,.09,"square",.035,{fc:3500});mn(b*2,t+.22,.16,"square",.03,{fc:3500,f2:b*1.2})}
+ if(k==5&&Math.random()<.2)mn(900+Math.random()*300,t,.12,"square",.02,{fc:4000,f2:2400})}
+function musicStart(){if(!mus.on||mus.tid)return;try{const a=ac();musInit();mus.next=a.currentTime+.15;mus.tid=setInterval(()=>{while(mus.next<a.currentTime+.25){musStep(mus.step++,mus.next);mus.next+=.15625}},60)}catch(e){}}
+function musicStop(){clearInterval(mus.tid);mus.tid=null}
+addEventListener("pointerdown",()=>musicStart());
+/* skala otomatis ke layar (desain 1600x900, tanpa scroll) */
+const APP=$("#app");function fit(){const s=Math.min(innerWidth/1600,innerHeight/900);APP.style.width=innerWidth/s+"px";APP.style.height=innerHeight/s+"px";APP.style.transform=`scale(${s})`;APP.style.left="0px";APP.style.top="0px"}addEventListener("resize",fit);fit();
+const goFS=()=>{const d=document,e=d.documentElement;try{if(d.fullscreenElement)d.exitFullscreen();else if(e.requestFullscreen)e.requestFullscreen().catch(()=>{});}catch(x){}};
+$("#fs").onclick=goFS;addEventListener("keydown",e=>{if(e.key=="f"&&!/INPUT|SELECT/.test(e.target.tagName))goFS()});
+buildScene();apply();setBtn();openSetup();
+</script>
+</body>
+</html>
